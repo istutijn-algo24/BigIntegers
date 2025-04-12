@@ -426,7 +426,12 @@ istream &operator>>(istream &in,BigInt&a){
 	for (int i = n - 1; i >= 0;i--){
 		if(!isdigit(s[i]))
 			throw("INVALID NUMBER");
-		a.digits[n - i - 1] = s[i];
+		a.digits.clear();
+		for (int i = n - 1; i >= 0; i--) {
+			if (!isdigit(s[i]))
+				throw("INVALID NUMBER");
+			a.digits.push_back(s[i] - '0');
+		}
 	}
 	return in;
 }
