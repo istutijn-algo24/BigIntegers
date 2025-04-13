@@ -419,22 +419,19 @@ BigInt Factorial(int n){
 	return f;
 }
 
-istream &operator>>(istream &in,BigInt&a){
-	string s;
-	in >> s;
-	int n = s.size();
-	for (int i = n - 1; i >= 0;i--){
-		if(!isdigit(s[i]))
-			throw("INVALID NUMBER");
-		a.digits.clear();
-		for (int i = n - 1; i >= 0; i--) {
-			if (!isdigit(s[i]))
-				throw("INVALID NUMBER");
-			a.digits.push_back(s[i] - '0');
-		}
-	}
-	return in;
+istream &operator>>(istream &in, BigInt &a) {
+    string s;
+    in >> s;
+    int n = s.size();
+    a.digits.clear();  // Clear existing digits before inserting new ones
+    for (int i = n - 1; i >= 0; i--) {
+        if (!isdigit(s[i]))
+            throw("INVALID NUMBER");
+        a.digits.push_back(s[i] - '0');  // Store in reverse order
+    }
+    return in;
 }
+
 
 ostream &operator<<(ostream &out,const BigInt &a){
 	for (int i = a.digits.size() - 1; i >= 0;i--)
@@ -512,6 +509,5 @@ int main()
 			<< i << " = ";
 		cout << fact << '\n';
 	}
-// This code is contributed
-// by Gatea David
+
 }
