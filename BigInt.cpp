@@ -263,37 +263,44 @@ BigInt operator*(const BigInt&a,const BigInt&b){
 	return temp;
 }
 
-BigInt &operator/=(BigInt& a,const BigInt &b){
-	if(Null(b))
-		throw("Arithmetic Error: Division By 0");
-	if(a < b){
-		a = BigInt();
-		return a;
-	}
-	if(a == b){
-		a = BigInt(1);
-		return a;
-	}
-	int i, lgcat = 0, cc;
-	int n = Length(a), m = Length(b);
-	vector<int> cat(n, 0);
-	BigInt t;
-	for (i = n - 1; t * 10 + a.digits[i] < b;i--){
-		t *= 10;
-		t += a.digits[i] ;
-	}
-	for (; i >= 0; i--){
-		t = t * 10 + a.digits[i];
-		for (cc = 9; cc * b > t;cc--);
-		t -= cc * b;
-		cat[lgcat++] = cc;
-	}
-	a.digits.resize(cat.size());
-	for (i = 0; i < lgcat;i++)
-		a.digits[i] = cat[lgcat - i - 1];
-	a.digits.resize(lgcat);
-	return a;
+BigInt &operator/=(BigInt &a, const BigInt &b) {
+    if (Null(b))
+        throw("Arithmetic Error: Division By 0");
+    if (a < b) {
+        a = BigInt();
+        return a;
+    }
+    if (a == b) {
+        a = BigInt(1);
+        return a;
+    }
+
+    BigInt quotient, remainder;
+    quotient.digits.resize(a.digits.size());
+
+    for (int i = a.digits.size() - 1; i >= 0; --i) {
+        // Bring down the next digit
+        remainder = remainder * 10 + a.digits[i];
+
+        // Find the maximum digit such that divisor * digit <= remainder
+        int q_digit = 0;
+        while (b * (q_digit + 1) <= remainder)
+            q_digit++;
+
+        quotient.digits[i] = q_digit;
+
+        // Subtract the found part
+        remainder -= b * q_digit;
+    }
+
+    // Remove leading zeros from quotient
+    while (quotient.digits.size() > 1 && quotient.digits.back() == 0)
+        quotient.digits.pop_back();
+
+    a = quotient;
+    return a;
 }
+
 BigInt operator/(const BigInt &a,const BigInt &b){
 	BigInt temp;
 	temp = a;
@@ -301,33 +308,26 @@ BigInt operator/(const BigInt &a,const BigInt &b){
 	return temp;
 }
 
-BigInt &operator%=(BigInt& a,const BigInt &b){
-	if(Null(b))
-		throw("Arithmetic Error: Division By 0");
-	if(a < b){
-		return a;
-	}
-	if(a == b){
-		a = BigInt();
-		return a;
-	}
-	int i, lgcat = 0, cc;
-	int n = Length(a), m = Length(b);
-	vector<int> cat(n, 0);
-	BigInt t;
-	for (i = n - 1; t * 10 + a.digits[i] < b;i--){
-		t *= 10;
-		t += a.digits[i];
-	}
-	for (; i >= 0; i--){
-		t = t * 10 + a.digits[i];
-		for (cc = 9; cc * b > t;cc--);
-		t -= cc * b;
-		cat[lgcat++] = cc;
-	}
-	a = t;
-	return a;
+BigInt &operator%=(BigInt &a, const BigInt &b) {
+    if (Null(b))
+        throw("Arithmetic Error: Division By 0");
+    if (a < b)
+        return a;
+    if (a == b) {
+        a = BigInt(0);
+        return a;
+    }
+
+    BigInt remainder;
+    for (int i = a.digits.size() - 1; i >= 0; --i) {
+        remainder = remainder * 10 + a.digits[i];
+        while (remainder >= b)
+            remainder -= b;
+    }
+    a = remainder;
+    return a;
 }
+
 BigInt operator%(const BigInt &a,const BigInt &b){
 	BigInt temp;
 	temp = a;
